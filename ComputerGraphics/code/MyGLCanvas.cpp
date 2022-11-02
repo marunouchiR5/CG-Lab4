@@ -38,7 +38,7 @@ void MyGLCanvas::setColor(int r, int g, int b) {
 }
 
 glm::vec3 MyGLCanvas::getEyePoint(int pixelX, int pixelY, int screenWidth, int screenHeight) {
-	glm::vec3 eye(float(-screenWidth + 2 * pixelX) / float(screenWidth), float(-screenHeight + 2 * pixelY) / float(screenHeight), 0);
+	glm::vec3 eye(float(-screenWidth + 2 * pixelX) / float(screenWidth), -float(-screenHeight + 2 * pixelY) / float(screenHeight), 0);
 	return eye;
 }
 
@@ -64,7 +64,7 @@ glm::vec3 MyGLCanvas::generateRay(int pixelX, int pixelY) {
 double MyGLCanvas::intersect(glm::vec3 eyePointP, glm::vec3 rayV, glm::mat4 transformMatrix) {
 	double t = -1;
 
-	glm::vec4 eyePointPO = glm::inverse(transformMatrix) * glm::vec4(eyePointP, 1);
+	glm::vec4 eyePointPO = glm::inverse(transformMatrix) * glm::vec4(eyePointP, 0);
 	glm::vec4 d = glm::inverse(transformMatrix) * glm::vec4(rayV, 0);
 
 	float r = 0.5;
@@ -84,8 +84,17 @@ double MyGLCanvas::intersect(glm::vec3 eyePointP, glm::vec3 rayV, glm::mat4 tran
 		return t;
 	}
 	else {
-		std::cout << std::min((-b + sqrt(delta)) / (2 * a), (-b - sqrt(delta)) / (2 * a)) << std::endl;
-		return std::min((-b + sqrt(delta)) / (2 * a), (-b - sqrt(delta)) / (2 * a));
+		double max_t = std::max((-b + sqrt(delta)) / (2 * a), (-b - sqrt(delta)) / (2 * a));
+		double min_t = std::min((-b + sqrt(delta)) / (2 * a), (-b - sqrt(delta)) / (2 * a));
+		if (max_t < 0) {
+			return t;
+		}
+		else if (min_t < 0 && max_t > 0) {
+			return max_t;
+		}
+		else {
+			return min_t;
+		}
 	}
 
 	return t;
