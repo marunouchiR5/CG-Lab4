@@ -38,7 +38,7 @@ void MyGLCanvas::setColor(int r, int g, int b) {
 }
 
 glm::vec3 MyGLCanvas::getEyePoint(int pixelX, int pixelY, int screenWidth, int screenHeight) {
-	glm::vec3 eye(float(- screenWidth + 2 * pixelX) / float(screenWidth), float(- screenHeight + 2 * pixelY) / float(screenWidth), 0);
+	glm::vec3 eye(float(-screenWidth + 2 * pixelX) / float(screenWidth), float(-screenHeight + 2 * pixelY) / float(screenHeight), 0);
 	return eye;
 }
 
@@ -61,12 +61,11 @@ glm::vec3 MyGLCanvas::generateRay(int pixelX, int pixelY) {
 	(1) a -1 if no intersection is found
 	(2) OR, the "t" value which is the distance from the origin of the ray to the (nearest) intersection point on the sphere
 */
-double MyGLCanvas::intersect (glm::vec3 eyePointP, glm::vec3 rayV, glm::mat4 transformMatrix) {
+double MyGLCanvas::intersect(glm::vec3 eyePointP, glm::vec3 rayV, glm::mat4 transformMatrix) {
 	double t = -1;
 
 	glm::vec4 eyePointPO = glm::inverse(transformMatrix) * glm::vec4(eyePointP, 1);
 	glm::vec4 d = glm::inverse(transformMatrix) * glm::vec4(rayV, 0);
-	// glm::vec4 d = glm::normalize(rayVO);     
 
 	float r = 0.5;
 	float a = glm::dot(d, d);
@@ -74,11 +73,19 @@ double MyGLCanvas::intersect (glm::vec3 eyePointP, glm::vec3 rayV, glm::mat4 tra
 	float c = glm::dot(eyePointPO, eyePointPO) - r * r;
 	double delta = b * b - 4 * a * c;
 
-	if (delta < 0) {
+	std::cout << "eyePointPO: " << eyePointPO[0] << " " << eyePointPO[1] << " " << eyePointPO[2] << std::endl;
+	std::cout << "d: " << d[0] << " " << d[1] << " " << d[2] << std::endl;
+	std::cout << "a: " << a << std::endl;
+	std::cout << "b: " << b << std::endl;
+	std::cout << "c: " << c << std::endl;
+	std::cout << "delta: " << delta << std::endl;
+
+	if (delta <= 0) {
 		return t;
 	}
 	else {
-		return std::min((-b + pow(delta, 0.5)) / (2 * a), (-b - pow(delta, 0.5)) / (2 * a));
+		std::cout << std::min((-b + sqrt(delta)) / (2 * a), (-b - sqrt(delta)) / (2 * a)) << std::endl;
+		return std::min((-b + sqrt(delta)) / (2 * a), (-b - sqrt(delta)) / (2 * a));
 	}
 
 	return t;
